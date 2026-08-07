@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: stg_users
+    description: "One row per user, typed and standardized from raw signup records."
+    columns:
+      - name: user_id
+        description: "Unique user identifier."
+        tests: [unique, not_null]
+      - name: signup_at
+        description: "Timestamp the user signed up (UTC)."
+        tests: [not_null]
+      - name: signup_platform
+        description: "Platform used at signup."
+        tests:
+          - accepted_values:
+              values: ["desktop", "mobile", "web"]
+
+  - name: stg_servers
+    description: "One row per server (community), with owner and category."
+    columns:
+      - name: server_id
+        description: "Unique server identifier."
+        tests: [unique, not_null]
+      - name: owner_user_id
+        description: "User who created/owns the server."
+        tests: [not_null]
+
+  - name: stg_server_joins
+    description: "One row per user-server join event."
+    columns:
+      - name: server_join_id
+        description: "Unique join event identifier."
+        tests: [unique, not_null]
+      - name: user_id
+        tests: [not_null]
+      - name: server_id
+        tests: [not_null]
+
+  - name: stg_messages
+    description: "One row per message sent, standardized."
+    columns:
+      - name: message_id
+        description: "Unique message identifier."
+        tests: [unique, not_null]
+      - name: user_id
+        tests: [not_null]
+      - name: sent_at
+        tests: [not_null]
+
+  - name: stg_voice_sessions
+    description: "One row per completed voice session with derived duration in minutes."
+    columns:
+      - name: voice_session_id
+        description: "Unique voice-session identifier."
+        tests: [unique, not_null]
+      - name: duration_minutes
+        description: "Session length in whole minutes (ended_at - started_at)."
+        tests:
+          - not_null
+          - non_negative
+
+  - name: stg_game_session_events
+    description: >
+      Raw game-session lifecycle events (started / ended). Each game_session_id emits
+      one 'game_session_started' and usually one 'game_session_ended'. A small share of
+      sessions never emit an end event, which downstream models handle explicitly.
+    columns:
+      - name: event_id
+        description: "Unique event identifier."
+        tests: [unique, not_null]
+      - name: event_type
+        description: "Lifecycle event type."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["game_session_started", "game_session_ended"]

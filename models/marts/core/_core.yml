@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: dim_users
+    description: "User dimension with signup attributes and lifetime activity summary."
+    columns:
+      - name: user_id
+        description: "Unique user identifier."
+        tests: [unique, not_null]
+      - name: is_activated
+        description: "True if the user has at least one active day."
+        tests: [not_null]
+
+  - name: dim_servers
+    description: "Server dimension with membership and messaging rollups."
+    columns:
+      - name: server_id
+        description: "Unique server identifier."
+        tests: [unique, not_null]
+      - name: member_count
+        description: "Distinct users who joined the server."
+        tests: [not_null]
+
+  - name: fct_events
+    description: >
+      Unioned engagement fact -- one row per event (message, voice, game_session,
+      server_join) at a shared grain for consistent slicing across BI tools.
+    columns:
+      - name: event_id
+        description: "Unique event identifier within its source stream."
+        tests: [not_null]
+      - name: event_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["message", "voice", "game_session", "server_join"]
+      - name: user_id
+        tests: [not_null]
+
+  - name: fct_game_sessions
+    description: "[WIP] One row per game session with duration and completion flag."
+    columns:
+      - name: game_session_id
+        tests: [unique, not_null]

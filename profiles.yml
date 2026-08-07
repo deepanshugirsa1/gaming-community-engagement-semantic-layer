@@ -1,0 +1,11 @@
+# Local profile (DuckDB) so the whole project runs with no cloud cost.
+# Run dbt from this folder with:  dbt build --profiles-dir .
+gaming_engagement:
+  target: duckdb
+  outputs:
+    duckdb:
+      type: duckdb
+      path: gaming.duckdb
+      schema: main
+      # single-threaded: dbt+duckdb multiprocessing can crash on Windows/OneDrive paths
+      threads: 1

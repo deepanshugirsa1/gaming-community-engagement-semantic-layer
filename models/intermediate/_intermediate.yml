@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: int_game_sessions
+    description: >
+      One row per game session, pairing start and end lifecycle events. Sessions with
+      no end event are retained with is_completed = false and null duration.
+    columns:
+      - name: game_session_id
+        description: "Unique game-session identifier."
+        tests: [unique, not_null]
+      - name: is_completed
+        description: "True when a matching game_session_ended event was found."
+        tests: [not_null]
+
+  - name: int_user_activity_daily
+    description: >
+      User activity rolled up to (user_id, activity_date, event_type). Shared grain
+      that all engagement and retention metrics build on.
+    columns:
+      - name: user_id
+        tests: [not_null]
+      - name: activity_date
+        tests: [not_null]
+      - name: event_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["message", "voice", "game_session", "server_join"]

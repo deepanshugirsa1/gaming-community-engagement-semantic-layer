@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: fct_user_engagement_daily
+    description: >
+      Governed daily engagement metrics at (activity_date, user_id) grain. Canonical
+      source for DAU and per-user engagement. See docs/01_metric_definitions.md.
+    columns:
+      - name: activity_date
+        description: "Calendar day of activity (UTC)."
+        tests: [not_null]
+      - name: user_id
+        description: "Active user on that day."
+        tests: [not_null]
+      - name: messages_sent
+        description: "Messages sent by the user that day (additive)."
+        tests:
+          - not_null
+          - non_negative
+      - name: voice_minutes
+        description: "Total completed voice minutes that day (additive)."
+        tests:
+          - not_null
+          - non_negative
+      - name: is_active_user
+        description: "Always true in this table; row existence defines a DAU."
+        tests: [not_null]
+
+  - name: mart_server_health
+    description: "[WIP] Server-level engagement rollups; weekly grain pending."
+    columns:
+      - name: server_id
+        tests: [unique, not_null]
